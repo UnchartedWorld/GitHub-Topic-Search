@@ -15,7 +15,7 @@ const config = {
 			fallback: '404.html',
 		}),
 		paths: {
-			base: process.env.NODE_ENV === 'production' ? '/GitHub-Topic-Search' : '',
+			base: process.argv.includes('dev') ? '' : "/GitHub-Topic-Search"
 		}
 	}
 };
