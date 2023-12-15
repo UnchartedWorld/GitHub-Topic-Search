@@ -1,4 +1,5 @@
 <script>
+	import { base } from "$app/paths";
 	import { page } from "$app/stores";
 </script>
 
@@ -13,7 +14,7 @@
         <p class="mt-5">Something went wrong. You're probably lost, so here's a button to get back home!</p>
 
         <div class="mt-10 flex items-center justify-center">
-            <a href="/" class="rounded-md shadow-sm px-3.5 py-2.5 bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">Head home</a>
+            <a href="{base}/" class="rounded-md shadow-sm px-3.5 py-2.5 bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">Head home</a>
         </div>
     </section>
 
