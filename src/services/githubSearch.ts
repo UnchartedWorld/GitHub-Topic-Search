@@ -1,10 +1,10 @@
-interface GitHubResponse {
+export interface GitHubResponse {
 	total_count: number;
 	incomplete_results: boolean;
 	items: GitHubRepoResponse[];
 }
 
-interface GitHubRepoResponse {
+export interface GitHubRepoResponse {
 	id: number;
 	name: string;
 	full_name: string;
@@ -19,6 +19,7 @@ interface GitHubRepoResponse {
 }
 
 let githubAPI: string = 'https://api.github.com/search/repositories?q=topic:';
+const gitHubCacheName = 'github-cache-v1.0';
 
 /**
  * Performs GitHub API requests that will return a list of both queries' repository results as
@@ -29,6 +30,16 @@ let githubAPI: string = 'https://api.github.com/search/repositories?q=topic:';
  */
 export async function searchOR(queries: string[]): Promise<GitHubRepoResponse[]> {
 	const apiResponses: GitHubRepoResponse[] = [];
+	const cacheKey = queries.join('_');
+
+	// This will check if the cache even exists.
+	const cache = await caches.open(gitHubCacheName);
+	const cachedResponse = await cache.match(cacheKey);
+
+	if (cachedResponse != null) {
+		console.log('Cached results found, using those. Yay for saving API calls!');
+		return cachedResponse.json();
+	}
 
 	if (queries != null && queries.length > 0) {
 		const apiRequests = queries.map((query) => `${githubAPI}${query}`);
@@ -40,6 +51,12 @@ export async function searchOR(queries: string[]): Promise<GitHubRepoResponse[]>
 			responseData.forEach((data: GitHubResponse) => {
 				apiResponses.push(...data.items);
 			});
+
+			const cacheResponse = new Response(JSON.stringify(apiResponses), {
+				headers: { 'Cache-Control': 'max-age=2600' }
+			});
+
+			cache.put(cacheKey, cacheResponse);
 		} catch (error) {}
 	}
 
@@ -51,10 +68,21 @@ export async function searchOR(queries: string[]): Promise<GitHubRepoResponse[]>
  * their topics.
  *
  * @param queries A list (likely of 2 strings) that represent a user's topic search parameters.
- * @returns A list of GitHubRepoResponse that contains both queries' results separately.
+ * @returns A list of GitHubRepoResponse that contains results that contain both queries together.
  */
 export async function searchAND(queries: string[]): Promise<GitHubRepoResponse[]> {
 	const apiResponses: GitHubRepoResponse[] = [];
+
+	const cacheKey = queries.join('_');
+
+	// This will check if the cache even exists.
+	const cache = await caches.open(gitHubCacheName);
+	const cachedResponse = await cache.match(cacheKey);
+
+	if (cachedResponse != null) {
+		console.log('Cached results found, using those. Yay for saving API calls!');
+		return cachedResponse.json();
+	}
 
 	if (queries != null && queries.length > 0) {
 		// I need to figure out how to add a + into the string, but otherwise this works!
@@ -67,6 +95,12 @@ export async function searchAND(queries: string[]): Promise<GitHubRepoResponse[]
 			});
 
 			apiResponses.push(...requestResponse.items);
+
+			const cacheResponse = new Response(JSON.stringify(apiResponses), {
+				headers: { 'Cache-Control': 'max-age=2600' }
+			});
+
+			cache.put(cacheKey, cacheResponse);
 		} catch (error) {}
 	}
 
@@ -87,6 +121,16 @@ export async function searchNOT(
 	secondQuery: string
 ): Promise<GitHubRepoResponse[]> {
 	const apiResponses: GitHubRepoResponse[] = [];
+	const cacheKey = firstQuery + '_' + secondQuery;
+
+	// This will check if the cache even exists.
+	const cache = await caches.open(gitHubCacheName);
+	const cachedResponse = await cache.match(cacheKey);
+
+	if (cachedResponse != null) {
+		console.log('Cached results found, using those. Yay for saving API calls!');
+		return cachedResponse.json();
+	}
 
 	if (firstQuery != null && secondQuery != null) {
 		const firstQueryRequest = `${githubAPI}${firstQuery}`;
@@ -104,6 +148,12 @@ export async function searchNOT(
 			};
 
 			apiResponses.push(...filteredResponse.items);
+
+			const cacheResponse = new Response(JSON.stringify(apiResponses), {
+				headers: { 'Cache-Control': 'max-age=2600' }
+			});
+
+			cache.put(cacheKey, cacheResponse);
 		} catch (error) {}
 	}
 
