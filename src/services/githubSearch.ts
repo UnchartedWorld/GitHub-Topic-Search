@@ -8,6 +8,7 @@ export interface GitHubRepoResponse {
 	id: number;
 	name: string;
 	full_name: string;
+	html_url: string;
 	description: string;
 	owner: {
 		name: string;
@@ -15,11 +16,14 @@ export interface GitHubRepoResponse {
 	stargazers_count: number;
 	watchers_count: number;
 	forks_count: number;
+	language: string;
 	topics: string[];
 }
 
 let githubAPI: string = 'https://api.github.com/search/repositories?q=topic:';
 const gitHubCacheName = 'github-cache-v1.0';
+
+let uniqueGitHubResults = new Set<GitHubRepoResponse>();
 
 /**
  * Performs GitHub API requests that will return a list of both queries' repository results as
@@ -30,34 +34,25 @@ const gitHubCacheName = 'github-cache-v1.0';
  */
 export async function searchOR(queries: string[]): Promise<GitHubRepoResponse[]> {
 	const apiResponses: GitHubRepoResponse[] = [];
-	const cacheKey = queries.join('_');
-
-	// This will check if the cache even exists.
-	const cache = await caches.open(gitHubCacheName);
-	const cachedResponse = await cache.match(cacheKey);
-
-	if (cachedResponse != null) {
-		console.log('Cached results found, using those. Yay for saving API calls!');
-		return cachedResponse.json();
-	}
 
 	if (queries != null && queries.length > 0) {
-		const apiRequests = queries.map((query) => `${githubAPI}${query}`);
+		for (let page = 1; page <= 5; page++) {
+			const apiRequests = queries.map((query) => `${githubAPI}${query}`);
 
-		try {
-			const requestResponses = await Promise.all(apiRequests.map((request) => fetch(request)));
-			const responseData = await Promise.all(requestResponses.map((response) => response.json()));
+			try {
+				const requestResponses = await Promise.all(apiRequests.map((request) => fetch(request)));
+				const responseData = await Promise.all(requestResponses.map((response) => response.json()));
 
-			responseData.forEach((data: GitHubResponse) => {
-				apiResponses.push(...data.items);
-			});
+				if (requestResponses.length === 0) {
+					break;
+				}
 
-			const cacheResponse = new Response(JSON.stringify(apiResponses), {
-				headers: { 'Cache-Control': 'max-age=2600' }
-			});
-
-			cache.put(cacheKey, cacheResponse);
-		} catch (error) {}
+				responseData.forEach((data: GitHubResponse) => {
+					apiResponses.push(...data.items);
+				});
+				
+			} catch (error) {}
+		}
 	}
 
 	return apiResponses;
@@ -73,35 +68,29 @@ export async function searchOR(queries: string[]): Promise<GitHubRepoResponse[]>
 export async function searchAND(queries: string[]): Promise<GitHubRepoResponse[]> {
 	const apiResponses: GitHubRepoResponse[] = [];
 
-	const cacheKey = queries.join('_');
-
-	// This will check if the cache even exists.
-	const cache = await caches.open(gitHubCacheName);
-	const cachedResponse = await cache.match(cacheKey);
-
-	if (cachedResponse != null) {
-		console.log('Cached results found, using those. Yay for saving API calls!');
-		return cachedResponse.json();
-	}
-
 	if (queries != null && queries.length > 0) {
 		// I need to figure out how to add a + into the string, but otherwise this works!
-		const fullAPIRequest = `${githubAPI}${queries[0].toString()} + ${'+'}topic:${queries[1].toString()}`;
 
-		try {
-			// I need to account for empty responses in some graceful way.
-			const requestResponse = await fetch(fullAPIRequest).then((response) => {
-				return response.json() as Promise<GitHubResponse>;
-			});
+		for (let page = 1; page <= 5; page++) {
+			const fullAPIRequest = `${githubAPI}${queries[0].toString()}+${'+'}topic:${queries[1].toString()}+${'&page='}+${page}`;
 
-			apiResponses.push(...requestResponse.items);
+			try {
+				// I need to account for empty responses in some graceful way.
+				const requestResponse = await fetch(fullAPIRequest).then((response) => {
+					return response.json() as Promise<GitHubResponse>;
+				});
 
-			const cacheResponse = new Response(JSON.stringify(apiResponses), {
-				headers: { 'Cache-Control': 'max-age=2600' }
-			});
+				if (requestResponse.items.length === 0) {
+					break;
+				}
 
-			cache.put(cacheKey, cacheResponse);
-		} catch (error) {}
+				requestResponse.items.forEach((item) => {
+					uniqueGitHubResults.add(item);
+				});
+
+				apiResponses.push(...Array.from(uniqueGitHubResults));
+			} catch (error) {}
+		}
 	}
 
 	return apiResponses;
@@ -121,40 +110,30 @@ export async function searchNOT(
 	secondQuery: string
 ): Promise<GitHubRepoResponse[]> {
 	const apiResponses: GitHubRepoResponse[] = [];
-	const cacheKey = firstQuery + '_' + secondQuery;
-
-	// This will check if the cache even exists.
-	const cache = await caches.open(gitHubCacheName);
-	const cachedResponse = await cache.match(cacheKey);
-
-	if (cachedResponse != null) {
-		console.log('Cached results found, using those. Yay for saving API calls!');
-		return cachedResponse.json();
-	}
 
 	if (firstQuery != null && secondQuery != null) {
-		const firstQueryRequest = `${githubAPI}${firstQuery}`;
+		for (let page = 1; page <= 5; page++) {
+			const firstQueryRequest = `${githubAPI}${firstQuery}+${'&page='}+${page}`.trim();
 
-		try {
-			const requestResponse: GitHubResponse = await fetch(firstQueryRequest).then((response) => {
-				return response.json() as Promise<GitHubResponse>;
-			});
+			try {
+				const requestResponse: GitHubResponse = await fetch(firstQueryRequest).then((response) => {
+					return response.json() as Promise<GitHubResponse>;
+				});
 
-			const filteredResponse: GitHubResponse = {
-				...requestResponse,
-				items: requestResponse.items.filter(
-					(item) => !item.topics.some((topic) => topic === secondQuery)
-				)
-			};
+				if (requestResponse.items.length === 0) {
+					break;
+				}
 
-			apiResponses.push(...filteredResponse.items);
+				const filteredResponse: GitHubResponse = {
+					...requestResponse,
+					items: requestResponse.items.filter(
+						(item) => !item.topics.some((topic) => topic === secondQuery)
+					)
+				};
 
-			const cacheResponse = new Response(JSON.stringify(apiResponses), {
-				headers: { 'Cache-Control': 'max-age=2600' }
-			});
-
-			cache.put(cacheKey, cacheResponse);
-		} catch (error) {}
+				apiResponses.push(...filteredResponse.items);
+			} catch (error) {}
+		}
 	}
 
 	return apiResponses;
