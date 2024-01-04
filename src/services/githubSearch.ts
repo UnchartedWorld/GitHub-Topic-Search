@@ -11,7 +11,8 @@ export interface GitHubRepoResponse {
 	html_url: string;
 	description: string;
 	owner: {
-		name: string;
+		login: string;
+		avatar_url: string;
 	};
 	stargazers_count: number;
 	watchers_count: number;
@@ -21,7 +22,6 @@ export interface GitHubRepoResponse {
 }
 
 let githubAPI: string = 'https://api.github.com/search/repositories?q=topic:';
-const gitHubCacheName = 'github-cache-v1.0';
 
 let uniqueGitHubResults = new Set<GitHubRepoResponse>();
 
