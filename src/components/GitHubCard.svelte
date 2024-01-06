@@ -13,11 +13,11 @@
 	<section
 		id={cardID.toString()}
 		class="border h-full rounded-md max-w-md
-           bg-white dark:bg-slate-800 shadow-md hover:shadow-lg transition duration-300 p-5"
+           bg-white dark:bg-neutral-700 shadow-md hover:shadow-lg transition duration-300 p-5"
 	>
-		<div class="p-4 md:p-5 flex flex-col h-full">
+		<div class="p-4 md:p-5 flex flex-col h-full dark:text-gray-100">
 			<h3 class="text-xl font-bold break-words">{cardTitle}</h3>
-			<p class="text-neutral-700 md:line-clamp-2">{cardDescription}</p>
+			<p class="text-neutral-700 dark:text-gray-400 md:line-clamp-2">{cardDescription}</p>
 			<div class="flex flex-row">
 				<img class="w-5 h-5 mr-1" src={cardUserAvatar} alt="GitHub account avatar" />
 				<p>Creator: {cardCreatorName}</p>
@@ -25,7 +25,7 @@
 			
 			<div class="flex flex-grow justify-between items-end">
 				<div class="flex flex-row">
-					<img class="w-5 h-5 mr-1" src="/star.svg" alt="GitHub stars" />
+					<img class="w-5 h-5 mr-1" src="star.svg" alt="GitHub stars" />
 					<p>{starCount}</p>
 				</div>
 				<p>Fork: {forkCount}</p>
