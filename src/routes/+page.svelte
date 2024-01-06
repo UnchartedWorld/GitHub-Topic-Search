@@ -11,7 +11,7 @@
 	let results: GitHubRepoResponse[] = [];
 	let firstSearchInput: string = '';
 	let secondSearchInput: string = '';
-	let selectedOption: string = '';
+	let selectedOption: string = 'Default';
 
 	async function returnGitHubAND() {
 		results = [];
@@ -35,6 +35,8 @@
 			returnGitHubAND();
 		} else if (selectedOption === 'NOT' && firstSearchInput != null && secondSearchInput != null) {
 			returnGitHubNOT();
+		} else {
+			selectedOption = "";
 		}
 	}
 </script>
@@ -44,37 +46,46 @@
 	<meta name="description" content="GitHub Topic Searcher" />
 </svelte:head>
 
-<section class="container mx-auto">
+<section class="container mx-auto px-6">
+	<h1 class="text-3xl font-extrabold py-16 text-center dark:text-gray-100">GitHub Topic Searcher</h1>
+
 	<form on:submit|preventDefault={handleSubmit}>
+
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="firstSearch">Enter your first query:</label>
 		<SearchBar
-			searchLabel="First searchbar"
+			searchID="firstSearch"
 			searchPlaceholder="Enter first search query"
 			bind:searchInput={firstSearchInput}
 		/>
 
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="searchOptions">Select search operator:</label>
 		<select
 			name="Search Options"
 			id="searchOptions"
 			bind:value={selectedOption}
-			class="px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat
-				   border border-solid border-gray-300 rounded transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
-				 focus:bg-white focus:shadow-md focus:border-blue-600 focus:outline-none"
+			class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
+				 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
+				 dark:border-neutral-600 rounded transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
+				 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
+				 focus:border-blue-600 focus:outline-none"
 			required
 		>
-			<option selected hidden>Please select an operator</option>
+			<option selected disabled value="Default">Please select an operator</option>
 			<option value="OR">OR</option>
 			<option value="AND">AND</option>
 			<option value="NOT">NOT</option>
 		</select>
 
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="secondSearch">Enter your second query:</label>
 		<SearchBar
-			searchLabel="Second searchbar"
+			searchID="secondSearch"
 			searchPlaceholder="Enter second search query"
 			bind:searchInput={secondSearchInput}
 		/>
 
 		<button
-			class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-5 mb-5 mt-5"
+			class="bg-blue-600 hover:bg-blue-800 text-white dark:text-neutral-100 font-bold 
+				     py-2 px-4 rounded ml-5 mb-5 mt-5"
 			type="submit">Submit</button
 		>
 	</form>
