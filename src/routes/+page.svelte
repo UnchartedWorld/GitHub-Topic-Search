@@ -50,8 +50,11 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="GitHub Topic Searcher" />
+	<title>Home - GitHub Topic Searcher</title>
+	<meta
+		name="description"
+		content="A GitHub Topic searcher that slightly expands the topic searcher's capabilities to allow an individual to use AND, NOT, OR search operators with their queries."
+	/>
 </svelte:head>
 
 <section class="container mx-auto px-6">
@@ -80,7 +83,7 @@
 				 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
 				 dark:border-neutral-600 rounded transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
 				 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
-				 focus:border-blue-600 focus:outline-none"
+				 focus:border-blue-600 focus:outline-none w-full max-w-screen-sm"
 			required
 		>
 			<option selected disabled value="Default">Please select an operator</option>
@@ -124,7 +127,7 @@
 			{/each}
 		</div>
 	{:else if isLoading == true}
-		<LoadingSpinner />
+		<LoadingSpinner spinnerID="spinID" />
 	{/if}
 </section>
 
