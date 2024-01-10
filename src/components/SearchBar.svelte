@@ -4,11 +4,11 @@
 	export let searchInput: string;
 </script>
 
-<div class="ml-6 max-w-md">
+<div class="ml-6 max-w-screen-xl">
 	<!-- Search bar -->
 	<div
-		class="relative mb-4 mt-2 flex w-full h-11 items-center overflow-hidde bg-white 
-			   dark:bg-neutral-700 rounded-md shadow-sm hover:shadow-md transition duration-300">
+		class="relative mb-4 mt-2 flex w-full h-11 items-center overflow-hidden bg-white 
+			   dark:bg-neutral-700 rounded-md shadow-sm hover:shadow-md transition duration-300 border">
 		<div class="grid place-items-center h-full w-11">
 			<img class="w-5 h-5 pr-1 dark:filter dark:invert" src="searchIcon.svg" alt="Magnifying glass representing a search icon" />
 		</div>
