@@ -1,4 +1,8 @@
-<div class="flex items-center justify-center py-20">
+<script lang="ts">
+    export let spinnerID: string;
+</script>
+
+<div id={spinnerID} class="flex items-center justify-center py-20">
 	<div
 		class="flex h-20 w-20 animate-spin rounded-full items-center justify-center
            bg-gradient-to-tr from-blue-400 to-blue-700 dark:from-blue-700 dark:to-blue-400"

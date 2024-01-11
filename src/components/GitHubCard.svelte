@@ -17,7 +17,7 @@
 	>
 		<div class="p-4 md:p-5 flex flex-col h-full dark:text-gray-100">
 			<div class="flex flex-row justify-between items-center">
-				<h2 class="text-xl font-bold break-words">{cardTitle}</h2>
+				<h2 class="text-xl font-bold break-all">{cardTitle}</h2>
 				<img class="w-10 h-10 mr-1" src={cardUserAvatar} alt="GitHub account avatar" />
 			</div>
 
