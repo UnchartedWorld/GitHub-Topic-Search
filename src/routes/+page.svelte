@@ -1,6 +1,7 @@
 <script lang="ts">
 	import GitHubCard from '../components/GitHubCard.svelte';
 	import LoadingSpinner from '../components/LoadingSpinner.svelte';
+	import Pagination from '../components/Pagination.svelte';
 	import SearchBar from '../components/SearchBar.svelte';
 	import {
 		type GitHubRepoResponse,
@@ -14,6 +15,18 @@
 	let secondSearchInput: string = '';
 	let selectedOption: string = 'Default';
 	let isLoading: boolean = false;
+
+	let pageSize: number = 15;
+	let currentPage: number = 1;
+
+	// For future learning, $: refers to reactive statements, which is fantastic for elements that may
+	// need to respond to user input i.e. pagination.
+
+	$: totalNumOfEntries = results.length;
+	$: totalPages = Math.ceil(totalNumOfEntries / pageSize);
+
+	// Gets the starting index, and ending index via the current page & pageSize.
+	$: displayedEntries = results.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
 	async function returnGitHubAND() {
 		isLoading = true;
@@ -111,9 +124,9 @@
 
 	{#if results.length > 0 && isLoading == false}
 		<div
-			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 space-x-3 space-y-3 md:space-x-6 md:space-y-6 py-16"
+			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 space-x-3 space-y-3 md:space-x-6 md:space-y-6 py-16 place-content-center"
 		>
-			{#each results as repo}
+			{#each displayedEntries as repo}
 				<GitHubCard
 					cardID={repo.id}
 					cardHTML={repo.html_url}
@@ -126,6 +139,8 @@
 				/>
 			{/each}
 		</div>
+
+		<Pagination bind:currentPage bind:totalPages />
 	{:else if isLoading == true}
 		<LoadingSpinner spinnerID="spinID" />
 	{/if}
