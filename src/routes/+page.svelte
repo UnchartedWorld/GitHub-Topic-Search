@@ -8,7 +8,7 @@
 		mostStarredResults,
 		leastForkedResults,
 		mostForkedResults
-	} from '../services/githubFilter';
+	} from '../services/githubSort';
 	import {
 		type GitHubRepoResponse,
 		searchAND,
