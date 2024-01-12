@@ -4,6 +4,12 @@
 	import Pagination from '../components/Pagination.svelte';
 	import SearchBar from '../components/SearchBar.svelte';
 	import {
+		leastStarredResults,
+		mostStarredResults,
+		leastForkedResults,
+		mostForkedResults
+	} from '../services/githubFilter';
+	import {
 		type GitHubRepoResponse,
 		searchAND,
 		searchOR,
@@ -13,7 +19,8 @@
 	let results: GitHubRepoResponse[] = [];
 	let firstSearchInput: string = '';
 	let secondSearchInput: string = '';
-	let selectedOption: string = 'Default';
+	let selectedOperatorOption: string = 'Default';
+	let selectedSortingOption: string = 'None';
 	let isLoading: boolean = false;
 
 	let pageSize: number = 15;
@@ -50,14 +57,40 @@
 	}
 
 	function handleSubmit() {
-		if (selectedOption === 'OR' && firstSearchInput != null && secondSearchInput != null) {
+		if (selectedOperatorOption === 'OR' && firstSearchInput != null && secondSearchInput != null) {
+			currentPage = 1;
+			selectedSortingOption = 'None';
 			returnGitHubOR();
-		} else if (selectedOption === 'AND' && firstSearchInput != null && secondSearchInput != null) {
+		} else if (
+			selectedOperatorOption === 'AND' &&
+			firstSearchInput != null &&
+			secondSearchInput != null
+		) {
+			currentPage = 1;
+			selectedSortingOption = 'None';
 			returnGitHubAND();
-		} else if (selectedOption === 'NOT' && firstSearchInput != null && secondSearchInput != null) {
+		} else if (
+			selectedOperatorOption === 'NOT' &&
+			firstSearchInput != null &&
+			secondSearchInput != null
+		) {
+			currentPage = 1;
+			selectedSortingOption = 'None';
 			returnGitHubNOT();
 		} else {
-			selectedOption = '';
+			selectedOperatorOption = '';
+		}
+	}
+
+	function handleSorting() {
+		if (selectedSortingOption === 'mostStars' && results.length > 0) {
+			results = mostStarredResults(results);
+		} else if (selectedSortingOption === 'leastStars' && results.length > 0) {
+			results = leastStarredResults(results);
+		} else if (selectedSortingOption === 'mostForks' && results.length > 0) {
+			results = mostForkedResults(results);
+		} else if (selectedSortingOption === 'leastForks' && results.length > 0) {
+			results = leastForkedResults(results);
 		}
 	}
 </script>
@@ -91,10 +124,10 @@
 		<select
 			name="Search Options"
 			id="searchOptions"
-			bind:value={selectedOption}
+			bind:value={selectedOperatorOption}
 			class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
 				 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
-				 dark:border-neutral-600 rounded transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
+				 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
 				 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
 				 focus:border-blue-600 focus:outline-none w-full max-w-screen-sm"
 			required
@@ -123,8 +156,28 @@
 	</form>
 
 	{#if results.length > 0 && isLoading == false}
+		<div class="flex justify-end">
+			<select
+				name="Sorting Options"
+				id="sortingOptions"
+				class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
+					 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
+					 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
+					 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
+					 focus:border-blue-600 focus:outline-none"
+				bind:value={selectedSortingOption}
+				on:change={handleSorting}
+			>
+				<option value="None" disabled selected>Sort results by:</option>
+				<option value="mostStars">Most stars</option>
+				<option value="leastStars">Least stars</option>
+				<option value="mostForks">Most forks</option>
+				<option value="leastForks">Least forks</option>
+			</select>
+		</div>
+
 		<div
-			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 space-x-3 space-y-3 md:space-x-6 md:space-y-6 py-16 place-content-center"
+			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-3 md:gap-x-6 md:gap-y-6 py-16 place-content-center"
 		>
 			{#each displayedEntries as repo}
 				<GitHubCard
