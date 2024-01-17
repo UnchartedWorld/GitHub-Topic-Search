@@ -4,6 +4,12 @@
 	import Pagination from '../components/Pagination.svelte';
 	import SearchBar from '../components/SearchBar.svelte';
 	import {
+		leastStarredResults,
+		mostStarredResults,
+		leastForkedResults,
+		mostForkedResults
+	} from '../services/githubSort';
+	import {
 		type GitHubRepoResponse,
 		searchAND,
 		searchOR,
@@ -13,7 +19,8 @@
 	let results: GitHubRepoResponse[] = [];
 	let firstSearchInput: string = '';
 	let secondSearchInput: string = '';
-	let selectedOption: string = 'Default';
+	let selectedOperatorOption: string = 'Default';
+	let selectedSortingOption: string = 'None';
 	let isLoading: boolean = false;
 
 	let pageSize: number = 15;
@@ -50,14 +57,40 @@
 	}
 
 	function handleSubmit() {
-		if (selectedOption === 'OR' && firstSearchInput != null && secondSearchInput != null) {
+		if (selectedOperatorOption === 'OR' && firstSearchInput != null && secondSearchInput != null) {
+			currentPage = 1;
+			selectedSortingOption = 'None';
 			returnGitHubOR();
-		} else if (selectedOption === 'AND' && firstSearchInput != null && secondSearchInput != null) {
+		} else if (
+			selectedOperatorOption === 'AND' &&
+			firstSearchInput != null &&
+			secondSearchInput != null
+		) {
+			currentPage = 1;
+			selectedSortingOption = 'None';
 			returnGitHubAND();
-		} else if (selectedOption === 'NOT' && firstSearchInput != null && secondSearchInput != null) {
+		} else if (
+			selectedOperatorOption === 'NOT' &&
+			firstSearchInput != null &&
+			secondSearchInput != null
+		) {
+			currentPage = 1;
+			selectedSortingOption = 'None';
 			returnGitHubNOT();
 		} else {
-			selectedOption = '';
+			selectedOperatorOption = '';
+		}
+	}
+
+	function handleSorting() {
+		if (selectedSortingOption === 'mostStars' && results.length > 0) {
+			results = mostStarredResults(results);
+		} else if (selectedSortingOption === 'leastStars' && results.length > 0) {
+			results = leastStarredResults(results);
+		} else if (selectedSortingOption === 'mostForks' && results.length > 0) {
+			results = mostForkedResults(results);
+		} else if (selectedSortingOption === 'leastForks' && results.length > 0) {
+			results = leastForkedResults(results);
 		}
 	}
 </script>
@@ -71,12 +104,12 @@
 </svelte:head>
 
 <section class="container mx-auto px-6">
-	<h1 class="text-3xl font-extrabold py-16 text-center dark:text-gray-100">
+	<h1 class="text-4xl font-extrabold py-16 text-center dark:text-gray-100">
 		GitHub Topic Searcher
 	</h1>
 
 	<form on:submit|preventDefault={handleSubmit}>
-		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="firstSearch"
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="firstSearch"
 			>Enter your first query:</label
 		>
 		<SearchBar
@@ -85,18 +118,18 @@
 			bind:searchInput={firstSearchInput}
 		/>
 
-		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="searchOptions"
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="searchOptions"
 			>Select search operator:</label
 		>
 		<select
 			name="Search Options"
 			id="searchOptions"
-			bind:value={selectedOption}
-			class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
+			bind:value={selectedOperatorOption}
+			class="relative px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
 				 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
-				 dark:border-neutral-600 rounded transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
+				 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
 				 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
-				 focus:border-blue-600 focus:outline-none w-full max-w-screen-sm"
+				 focus-within:border focus-within:border-violet-600 focus:outline-none w-4/6 max-w-screen-sm"
 			required
 		>
 			<option selected disabled value="Default">Please select an operator</option>
@@ -105,7 +138,7 @@
 			<option value="NOT">NOT</option>
 		</select>
 
-		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="secondSearch"
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="secondSearch"
 			>Enter your second query:</label
 		>
 		<SearchBar
@@ -115,7 +148,7 @@
 		/>
 
 		<button
-			class="bg-blue-600 hover:bg-blue-800 text-white dark:text-neutral-100 font-bold
+			class="bg-violet-600 hover:bg-violet-800 text-white dark:text-neutral-100 font-bold
 				     py-2 px-4 rounded ml-5 mb-5 mt-5 disabled:opacity-50 disabled:cursor-not-allowed"
 			type="submit"
 			disabled={isLoading}>Submit</button
@@ -123,8 +156,28 @@
 	</form>
 
 	{#if results.length > 0 && isLoading == false}
+		<div class="flex justify-end">
+			<select
+				name="Sorting Options"
+				id="sortingOptions"
+				class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
+					 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
+					 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
+					 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
+					 focus:border-blue-600 focus:outline-none"
+				bind:value={selectedSortingOption}
+				on:change={handleSorting}
+			>
+				<option value="None" disabled selected>Sort results by:</option>
+				<option value="mostStars">Most stars</option>
+				<option value="leastStars">Least stars</option>
+				<option value="mostForks">Most forks</option>
+				<option value="leastForks">Least forks</option>
+			</select>
+		</div>
+
 		<div
-			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 space-x-3 space-y-3 md:space-x-6 md:space-y-6 py-16 place-content-center"
+			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-3 md:gap-x-6 md:gap-y-6 py-16 place-content-center"
 		>
 			{#each displayedEntries as repo}
 				<GitHubCard

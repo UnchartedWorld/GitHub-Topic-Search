@@ -12,7 +12,7 @@
 <a href={cardHTML}>
 	<section
 		id={cardID.toString()}
-		class="border h-full rounded-md max-w-md
+		class="border border-violet-600 h-full rounded-md max-w-md
            bg-white dark:bg-neutral-700 shadow-md hover:shadow-lg transition duration-300 p-5"
 	>
 		<div class="p-4 md:p-5 flex flex-col h-full dark:text-gray-100">

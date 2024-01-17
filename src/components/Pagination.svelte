@@ -19,7 +19,7 @@
 	<ul class="flex py-5 justify-center">
 		<li>
 			<button
-				class="h-10 px-5 bg-blue-600 hover:bg-blue-800 text-white dark:text-neutral-100 font-bold
+				class="h-10 px-5 bg-violet-600 hover:bg-violet-800 text-white dark:text-neutral-100 font-bold
             py-2 rounded-full disabled:opacity-60 disabled:cursor-not-allowed"
 				on:click={previousPage}
 				disabled={currentPage === 1}>« Previous</button
@@ -32,7 +32,7 @@
 		</li>
 		<li>
 			<button
-				class="h-10 px-5 bg-blue-600 hover:bg-blue-800 text-white dark:text-neutral-100 font-bold
+				class="h-10 px-5 bg-violet-600 hover:bg-violet-800 text-white dark:text-neutral-100 font-bold
             py-2 rounded-full disabled:opacity-60 disabled:cursor-not-allowed"
 				on:click={nextPage}
 				disabled={currentPage === totalPages}>Next »</button
