@@ -104,12 +104,12 @@
 </svelte:head>
 
 <section class="container mx-auto px-6">
-	<h1 class="text-3xl font-extrabold py-16 text-center dark:text-gray-100">
+	<h1 class="text-4xl font-extrabold py-16 text-center dark:text-gray-100">
 		GitHub Topic Searcher
 	</h1>
 
 	<form on:submit|preventDefault={handleSubmit}>
-		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="firstSearch"
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="firstSearch"
 			>Enter your first query:</label
 		>
 		<SearchBar
@@ -118,18 +118,18 @@
 			bind:searchInput={firstSearchInput}
 		/>
 
-		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="searchOptions"
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="searchOptions"
 			>Select search operator:</label
 		>
 		<select
 			name="Search Options"
 			id="searchOptions"
 			bind:value={selectedOperatorOption}
-			class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
+			class="relative px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
 				 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
 				 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
 				 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
-				 focus:border-blue-600 focus:outline-none w-full max-w-screen-sm"
+				 focus-within:border focus-within:border-violet-600 focus:outline-none w-4/6 max-w-screen-sm"
 			required
 		>
 			<option selected disabled value="Default">Please select an operator</option>
@@ -138,7 +138,7 @@
 			<option value="NOT">NOT</option>
 		</select>
 
-		<label class="block font-bold text-sm dark:text-gray-100 px-3 py-1.5" for="secondSearch"
+		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="secondSearch"
 			>Enter your second query:</label
 		>
 		<SearchBar
@@ -148,7 +148,7 @@
 		/>
 
 		<button
-			class="bg-blue-600 hover:bg-blue-800 text-white dark:text-neutral-100 font-bold
+			class="bg-violet-600 hover:bg-violet-800 text-white dark:text-neutral-100 font-bold
 				     py-2 px-4 rounded ml-5 mb-5 mt-5 disabled:opacity-50 disabled:cursor-not-allowed"
 			type="submit"
 			disabled={isLoading}>Submit</button
