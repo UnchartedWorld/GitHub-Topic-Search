@@ -23,8 +23,6 @@ export interface GitHubRepoResponse {
 
 let githubAPI: string = 'https://api.github.com/search/repositories?q=topic:';
 
-let uniqueGitHubResults = new Set<GitHubRepoResponse>();
-
 /**
  * Performs GitHub API requests that will return a list of both queries' repository results as
  * if they were searched separately.
@@ -34,6 +32,7 @@ let uniqueGitHubResults = new Set<GitHubRepoResponse>();
  */
 export async function searchOR(queries: string[]): Promise<GitHubRepoResponse[]> {
 	const apiResponses: GitHubRepoResponse[] = [];
+	let uniqueGitHubResults = new Set<GitHubRepoResponse>();
 
 	if (queries != null && queries.length > 0) {
 		for (let page = 1; page <= 5; page++) {
@@ -67,6 +66,7 @@ export async function searchOR(queries: string[]): Promise<GitHubRepoResponse[]>
  */
 export async function searchAND(queries: string[]): Promise<GitHubRepoResponse[]> {
 	const apiResponses: GitHubRepoResponse[] = [];
+	let uniqueGitHubResults = new Set<GitHubRepoResponse>();
 
 	if (queries != null && queries.length > 0) {
 		// I need to figure out how to add a + into the string, but otherwise this works!
