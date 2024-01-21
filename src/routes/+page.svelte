@@ -157,23 +157,26 @@
 
 	{#if results.length > 0 && isLoading == false}
 		<div class="flex justify-end">
-			<select
-				name="Sorting Options"
-				id="sortingOptions"
-				class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
+			<div class="flex flex-col">
+				<label class="font-bold text-sm dark:text-gray-100 px-1 py-1.5" for="sortingOptions"
+					>Choose an (optional) sorting order:</label>
+				<select
+					name="Sorting Options"
+					id="sortingOptions"
+					class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
 					 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
 					 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
-					 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
-					 focus:border-blue-600 focus:outline-none"
-				bind:value={selectedSortingOption}
-				on:change={handleSorting}
-			>
-				<option value="None" disabled selected>Sort results by:</option>
-				<option value="mostStars">Most stars</option>
-				<option value="leastStars">Least stars</option>
-				<option value="mostForks">Most forks</option>
-				<option value="leastForks">Least forks</option>
-			</select>
+					 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md 
+					 focus:ring-violet-600 focus:ring-1"
+					bind:value={selectedSortingOption}
+					on:change={handleSorting}>
+					<option value="None" disabled selected>Sort results by:</option>
+					<option value="mostStars">Most stars</option>
+					<option value="leastStars">Least stars</option>
+					<option value="mostForks">Most forks</option>
+					<option value="leastForks">Least forks</option>
+				</select>
+			</div>
 		</div>
 
 		<div
