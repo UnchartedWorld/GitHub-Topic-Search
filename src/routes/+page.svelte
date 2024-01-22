@@ -198,7 +198,7 @@
 
 		<Pagination bind:currentPage bind:totalPages />
 	{:else if isLoading == true}
-		<LoadingSpinner spinnerID="spinID" />
+		<LoadingSpinner loading={isLoading} spinnerID="spinID" />
 	{/if}
 </section>
 
