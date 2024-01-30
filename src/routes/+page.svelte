@@ -15,6 +15,7 @@
 		searchOR,
 		searchNOT
 	} from '../services/githubSearch';
+	import InfoTip from '../components/InfoTip.svelte';
 
 	let results: GitHubRepoResponse[] = [];
 	let firstSearchInput: string = '';
@@ -121,22 +122,28 @@
 		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="searchOptions"
 			>Select search operator:</label
 		>
-		<select
-			name="Search Options"
-			id="searchOptions"
-			bind:value={selectedOperatorOption}
-			class="relative px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
+		<div class="flex flex-row">
+			<select
+				name="Search Options"
+				id="searchOptions"
+				bind:value={selectedOperatorOption}
+				class="relative px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
 				 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
-				 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
+				 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 mt-2 ml-6 focus:text-gray-700
 				 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
 				 focus-within:border focus-within:border-violet-600 focus:outline-none w-4/6 max-w-screen-sm"
-			required
-		>
-			<option selected disabled value="Default">Please select an operator</option>
-			<option value="OR">OR</option>
-			<option value="AND">AND</option>
-			<option value="NOT">NOT</option>
-		</select>
+				required
+			>
+				<option selected disabled value="Default">Please select an operator</option>
+				<option value="OR">OR</option>
+				<option value="AND">AND</option>
+				<option value="NOT">NOT</option>
+			</select>
+			<InfoTip
+				tooltipContentID="searchOptionsTip"
+				tooltipText="Logical operators showing either, both or only the first query's results."
+			/>
+		</div>
 
 		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="secondSearch"
 			>Enter your second query:</label
@@ -159,17 +166,19 @@
 		<div class="flex justify-end">
 			<div class="flex flex-col">
 				<label class="font-bold text-sm dark:text-gray-100 px-1 py-1.5" for="sortingOptions"
-					>Choose an (optional) sorting order:</label>
+					>Choose an (optional) sorting order:</label
+				>
 				<select
 					name="Sorting Options"
 					id="sortingOptions"
 					class="px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-100 bg-white
 					 dark:bg-neutral-700 bg-clip-padding bg-no-repeat border border-solid border-gray-300
 					 dark:border-neutral-600 rounded-md transition ease-in-out m-0 mb-2 ml-6 focus:text-gray-700
-					 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md 
+					 dark:focus:text-gray-100 focus:bg-white dark:focus:bg-neutral-700 focus:shadow-md
 					 focus:ring-violet-600 focus:ring-1"
 					bind:value={selectedSortingOption}
-					on:change={handleSorting}>
+					on:change={handleSorting}
+				>
 					<option value="None" disabled selected>Sort results by:</option>
 					<option value="mostStars">Most stars</option>
 					<option value="leastStars">Least stars</option>
