@@ -16,6 +16,7 @@
 		searchNOT
 	} from '../services/githubSearch';
 	import InfoTip from '../components/InfoTip.svelte';
+	import BackToTopButton from '../components/BackToTopButton.svelte';
 
 	let results: GitHubRepoResponse[] = [];
 	let firstSearchInput: string = '';
@@ -108,6 +109,8 @@
 	<h1 class="text-4xl font-extrabold py-16 text-center dark:text-gray-100">
 		GitHub Topic Searcher
 	</h1>
+
+	<BackToTopButton numOfPxUntilVisible={300} />
 
 	<form on:submit|preventDefault={handleSubmit}>
 		<label class="block font-bold text-sm dark:text-gray-100 px-3 ml-3 py-1.5" for="firstSearch"
